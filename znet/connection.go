@@ -76,7 +76,7 @@ func (c *Connection) GetTCPConnection() *net.TCPConn {
 }
 
 // 获取当前链接模块的id
-func (c *Connection) GetConnID() int32 {
+func (c *Connection) GetConnID() uint32 {
 	return c.ConnID
 }
 
@@ -87,8 +87,9 @@ func (c *Connection) RemoteAddr() net.Addr {
 
 // 发送数据给客户端
 func (c *Connection) Send(data []byte) error {
-	n, err := c.Conn.Write(data)
+	_, err := c.Conn.Write(data)
 	if err != nil {
 		return err
 	}
+	return nil
 }
