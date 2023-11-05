@@ -16,6 +16,8 @@ type Server struct {
 	IP string
 	// 端口
 	Port int
+	// v0.3 增加路由字段, 该版本一个服务只能注册一个路由，暂不支持多路由
+	Route zinterface.IRouter
 }
 
 func (s *Server) Start() {
@@ -45,7 +47,7 @@ func (s *Server) Start() {
 				return
 			}
 			// 读取链接中内容, 并进行业务处理
-			session := NewConnection(conn, seqId, dealCollback)
+			session := NewConnection(conn, seqId, s.Route)
 			go session.Start()
 			seqId++
 		}
@@ -66,6 +68,10 @@ func (s *Server) Server() {
 	select {}
 }
 
+func (s *Server) AddRouter(route zinterface.IRouter) {
+	s.Route = route
+}
+
 // 初始化server
 func NewServer(name string) zinterface.IServer {
 	s := Server{
@@ -73,6 +79,7 @@ func NewServer(name string) zinterface.IServer {
 		IPVersion: "tcp4",
 		IP:        "0.0.0.0",
 		Port:      8089,
+		Route:     nil,
 	}
 	return &s
 }

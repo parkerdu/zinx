@@ -13,7 +13,7 @@ type IConnection interface {
 	// 获取当前的链接socket
 	GetTCPConnection() *net.TCPConn
 	// 获取当前链接模块的id
-	GetConnID() int32
+	GetConnID() uint32
 
 	// 获取客户端的tcp状态  IP port
 	RemoteAddr() net.Addr

@@ -6,6 +6,7 @@ import (
 	"zinx/zinterface"
 )
 
+// todo 修改成session
 type Connection struct {
 	// 当前的链接
 	Conn *net.TCPConn
@@ -14,21 +15,22 @@ type Connection struct {
 
 	// 当前链接状态
 	isClosed bool
-	// 当前链接绑定的路由处理方法
-	handleAPI zinterface.HandleFunc
 
 	// 推出chan
 	ExitChan chan bool
+
+	// v0.3 增加router字段
+	Router zinterface.IRouter
 }
 
-// 初始化
-func NewConnection(conn *net.TCPConn, connID uint32, callback zinterface.HandleFunc) *Connection {
+// 初始化, 每个conn --> 对应一个route处理方法
+func NewConnection(conn *net.TCPConn, connID uint32, route zinterface.IRouter) *Connection {
 	c := Connection{
-		Conn:      conn,
-		ConnID:    connID,
-		isClosed:  false,
-		handleAPI: callback,
-		ExitChan:  make(chan bool),
+		Conn:     conn,
+		ConnID:   connID,
+		isClosed: false,
+		ExitChan: make(chan bool),
+		Router:   route,
 	}
 	return &c
 }
@@ -40,14 +42,24 @@ func (c *Connection) StartRead() {
 
 	for {
 		buf := make([]byte, 512)
-		n, err := c.Conn.Read(buf)
+		_, err := c.Conn.Read(buf)
 		if err != nil {
 			continue
 		}
 
-		if err := c.handleAPI(c.Conn, buf, n); err != nil {
-			break
+		//// v0.2 版本直接调用handleAPI, 在v0.3中替换为调用该链接对应的理由方法
+		//if err := c.handleAPI(c.Conn, buf, n); err != nil {
+		//	break
+		//}
+
+		// v0.3 改成调用该链接对应的路由来处理消息
+		req := Request{
+			conn: c,
+			data: buf,
 		}
+		c.Router.PreHandle(&req)
+		c.Router.Handle(&req)
+		c.Router.PostHandle(&req)
 	}
 }
 
