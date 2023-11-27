@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<server>
+    <host>0.0.0.0</host>
+    <port>8089</port>
+    <name>"Zinx v0.5"</name>
+</server>
+

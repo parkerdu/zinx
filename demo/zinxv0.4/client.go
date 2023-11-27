@@ -10,10 +10,10 @@ import (
 模拟客户端
 */
 
-func main() {
+func main1() {
 	fmt.Println("client start...")
 	// 1、链接服务，得到conn
-	conn, err := net.Dial("tcp", "127.0.0.1:8079")
+	conn, err := net.Dial("tcp", "127.0.0.1:8089")
 	if err != nil {
 		fmt.Println(err)
 		return

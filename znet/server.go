@@ -3,6 +3,7 @@ package znet
 import (
 	"fmt"
 	"net"
+	"zinx/config"
 	"zinx/zinterface"
 )
 
@@ -47,7 +48,7 @@ func (s *Server) Start() {
 				return
 			}
 			// 读取链接中内容, 并进行业务处理
-			session := NewConnection(conn, seqId, s.Route)
+			session := NewSession(conn, seqId, s.Route)
 			go session.Start()
 			seqId++
 		}
@@ -75,10 +76,10 @@ func (s *Server) AddRouter(route zinterface.IRouter) {
 // 初始化server
 func NewServer(name string) zinterface.IServer {
 	s := Server{
-		Name:      name,
+		Name:      config.Server().Name,
 		IPVersion: "tcp4",
-		IP:        "0.0.0.0",
-		Port:      8089,
+		IP:        config.Server().Host,
+		Port:      config.Server().Port,
 		Route:     nil,
 	}
 	return &s
