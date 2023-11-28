@@ -21,17 +21,20 @@ type Session struct {
 	ExitChan chan bool
 
 	// v0.3 增加router字段
-	Router zinterface.IRouter
+	//Router zinterface.IRouter
+
+	// v0.6 修改router为handle，多路由
+	Handle zinterface.MsgHandler
 }
 
 // 初始化, 每个conn --> 对应一个route处理方法
-func NewSession(conn *net.TCPConn, connID uint32, route zinterface.IRouter) *Session {
+func NewSession(conn *net.TCPConn, connID uint32, handle zinterface.MsgHandler) *Session {
 	c := Session{
 		Conn:     conn,
 		ConnID:   connID,
 		isClosed: false,
 		ExitChan: make(chan bool),
-		Router:   route,
+		Handle:   handle,
 	}
 	return &c
 }
@@ -100,10 +103,8 @@ func (s *Session) Receive() {
 			conn: s,
 			msg:  imsg,
 		}
-
-		s.Router.PreHandle(&req)
-		s.Router.Handle(&req)
-		s.Router.PostHandle(&req)
+		// 使用handle 处理request消息
+		go s.Handle.DoMsgHandle(&req)
 	}
 }
 

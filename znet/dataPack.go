@@ -36,7 +36,7 @@ func (d *DataPack) Pack(msg zinterface.IMessage) ([]byte, error) {
 		return nil, err
 	}
 
-	// step4: 写史记数据
+	// step4: 写实际的数据 todo 将数据封装成协议，里面有method, data
 	if err := binary.Write(buf, binary.BigEndian, msg.GetData()); err != nil {
 		return nil, err
 	}
